@@ -27,10 +27,11 @@ class Menu:
 
     def order_food(self):
         while True:
+            print("\n" + "-" * 40)
             print(f"\nПожалуйста, выберите блюдо:")
             display_menu_columns("Меню блюд", self.food_menu, 3)
 
-            request = input("Ваш выбор (или 'н'(назад) для выхода): ").strip()
+            request = input("Ваш выбор (или 'назад' (или 'н') для выхода): ").strip()
 
             if request.lower() in ["назад", "н", "exit"]:
                 break
@@ -43,12 +44,13 @@ class Menu:
 
     def order_drinks(self):
         while True:
+            print("\n" + "-" * 40)
             print(f"\nВыберите напиток:")
-            display_menu_columns("Меню напитков", self.drink_menu, 3)
+            display_menu_columns("Меню блюд", self.drink_menu, 3)
 
-            request = input("Ваш выбор (или 'назад' для выхода): ").strip()
+            request = input("Ваш выбор (или 'назад' (или 'н') для выхода): ").strip()
 
-            if request.lower() in ["назад", "н", "exit"]:
+            if request.lower() in ["назад", 'н', "exit"]:
                 break
 
             if request in self.drink_menu:
@@ -58,9 +60,21 @@ class Menu:
 
 
     def add_to_order(self, item, price):
-        print(f"{item} добавлен в заказ ({price} руб.).")
-        self.order_list.append((item, price))
-        self.total_price += price
+        while True:
+            try:
+                print("\n" + "-" * 40)
+                quantity = int(input(f"Сколько порций {item} вам нужно? ").strip())
+                if quantity <= 0:
+                    print("Количество должно быть больше 0!")
+                    continue
+                break
+            except ValueError:
+                print("Пожалуйста, введите число!")
+
+        total_item_price = price * quantity
+        print(f"{item} ({quantity} шт.) добавлен в заказ ({total_item_price} руб.).")
+        self.order_list.append((item, quantity, total_item_price))
+        self.total_price += total_item_price
 
 
     def check_availability(self, item):
@@ -74,12 +88,21 @@ class Menu:
 
     def show_order(self):
         if self.order_list:
+            print("\n" + "-" * 40 + "Заказ" + "-" * 40)
             print("\nВаш заказ:")
-            for item, price in self.order_list:
-                print(f"- {item} ({price} руб.)")
+            for item, quantity, total_item_price in self.order_list:
+                print(f"- {item} ({quantity} шт.) — {total_item_price} руб.")
             print(f"\nИтого: {self.total_price} руб.")
+            print("\n" + "-" * 40)
         else:
             print("\nВы ничего не заказали.")
+
+    
+    def display_menu(self, items):
+        print("-" * 30)
+        for name, price in items.items():
+            print(f"{name:<20} {price} руб.")
+        print("-" * 30)
 
 
 def display_menu_columns(title, items, columns=3):
